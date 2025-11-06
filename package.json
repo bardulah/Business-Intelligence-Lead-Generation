@@ -4,13 +4,17 @@
   "description": "Automated Lead Discovery and Research Tool - Production Ready",
   "main": "dist/server/index.js",
   "scripts": {
-    "dev": "concurrently \"npm run server:dev\" \"npm run client:dev\"",
+    "setup": "ts-node server/scripts/setup.ts",
+    "dev": "concurrently \"npm run server:dev\" \"npm run worker:dev\" \"npm run client:dev\"",
     "server:dev": "nodemon --exec ts-node server/index.ts",
+    "worker:dev": "nodemon --exec ts-node server/scripts/start-worker.ts",
     "server:build": "tsc -p tsconfig.server.json",
     "client:dev": "cd client && npm run dev",
     "client:build": "cd client && npm run build",
     "build": "npm run server:build && npm run client:build",
     "start": "node dist/server/index.js",
+    "start:worker": "node dist/server/scripts/start-worker.js",
+    "start:all": "concurrently \"npm start\" \"npm run start:worker\"",
     "install-all": "npm install && cd client && npm install",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -21,7 +25,8 @@
     "docker:down": "docker-compose down",
     "prisma:migrate": "prisma migrate dev",
     "prisma:generate": "prisma generate",
-    "prisma:studio": "prisma studio"
+    "prisma:studio": "prisma studio",
+    "prisma:reset": "prisma migrate reset --force"
   },
   "keywords": [
     "lead-generation",
