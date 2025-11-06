@@ -13,3 +13,7 @@ build/
 coverage/
 client/dist/
 client/build/
+logs/
+playwright-report/
+test-results/
+*.tsbuildinfo
