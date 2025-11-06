@@ -82,14 +82,13 @@ app.get('/health', (req, res) => {
   });
 });
 
-// TODO: Import and mount routes
-// app.use('/api/auth', authRoutes);
-// app.use('/api/leads', authenticate, leadRoutes);
-// app.use('/api/github', authenticate, githubRoutes);
-// app.use('/api/technology', authenticate, technologyRoutes);
-// app.use('/api/contacts', authenticate, contactRoutes);
-// app.use('/api/export', authenticate, exportLimiter, exportRoutes);
-// app.use('/api/jobs', authenticate, jobRoutes);
+// Import routes
+import authRoutes from './routes/auth';
+import leadRoutes from './routes/leads';
+
+// Mount routes
+app.use('/api/auth', authRoutes);
+app.use('/api/leads', leadRoutes);
 
 // WebSocket connection handling
 io.on('connection', (socket) => {
