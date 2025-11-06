@@ -1,0 +1,160 @@
+// Prisma schema for Lead Discovery Tool
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String?
+  role      UserRole @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  leads     Lead[]
+  workspace Workspace? @relation(fields: [workspaceId], references: [id])
+  workspaceId String?
+
+  @@index([email])
+  @@map("users")
+}
+
+model Workspace {
+  id        String   @id @default(uuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users User[]
+  leads Lead[]
+
+  @@map("workspaces")
+}
+
+model Lead {
+  id          String     @id @default(uuid())
+  name        String
+  domain      String?
+  status      LeadStatus @default(NEW)
+  priority    Priority   @default(MEDIUM)
+
+  // Scoring
+  score       Float
+  grade       String
+  confidence  Float
+
+  // GitHub Data
+  githubData  Json?
+
+  // Company Data
+  companyData Json?
+
+  // Technology Data
+  techData    Json?
+
+  // Contact Data
+  contactData Json?
+
+  // Metadata
+  source      String
+  notes       String?
+  tags        String[]
+
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  lastAnalyzedAt DateTime?
+
+  // Relations
+  userId      String
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspaceId String?
+  workspace   Workspace? @relation(fields: [workspaceId], references: [id])
+
+  activities  LeadActivity[]
+
+  @@index([userId, status])
+  @@index([workspaceId])
+  @@index([domain])
+  @@index([score])
+  @@map("leads")
+}
+
+model LeadActivity {
+  id        String       @id @default(uuid())
+  type      ActivityType
+  data      Json?
+  createdAt DateTime     @default(now())
+
+  leadId    String
+  lead      Lead         @relation(fields: [leadId], references: [id], onDelete: Cascade)
+
+  @@index([leadId, createdAt])
+  @@map("lead_activities")
+}
+
+model AnalysisJob {
+  id          String    @id @default(uuid())
+  jobId       String    @unique
+  status      JobStatus @default(PENDING)
+  type        String
+  input       Json
+  result      Json?
+  error       String?
+  progress    Int       @default(0)
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  completedAt DateTime?
+
+  @@index([jobId])
+  @@index([status, createdAt])
+  @@map("analysis_jobs")
+}
+
+enum UserRole {
+  USER
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  NEGOTIATING
+  WON
+  LOST
+  ARCHIVED
+}
+
+enum Priority {
+  VERY_LOW
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum ActivityType {
+  CREATED
+  UPDATED
+  ANALYZED
+  CONTACTED
+  NOTE_ADDED
+  STATUS_CHANGED
+  EXPORTED
+}
+
+enum JobStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
