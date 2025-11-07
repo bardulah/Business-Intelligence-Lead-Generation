@@ -3,7 +3,6 @@ import authService from '../services/authService';
 import { authLimiter } from '../middleware/rateLimiter';
 import { validateSchema, LoginSchema, RegisterSchema } from '../utils/validation';
 import { AuthRequest, authenticate } from '../middleware/auth';
-import logger from '../utils/logger';
 
 const router = Router();
 
@@ -35,13 +34,15 @@ router.post('/login', authLimiter, async (req, res, next) => {
 router.get('/me', authenticate, async (req: AuthRequest, res, next) => {
   try {
     if (!req.user) {
-      return res.status(401).json({ error: 'Not authenticated' });
+      res.status(401).json({ error: 'Not authenticated' });
+      return;
     }
 
     const user = await authService.getUserById(req.user.userId);
 
     if (!user) {
-      return res.status(404).json({ error: 'User not found' });
+      res.status(404).json({ error: 'User not found' });
+      return;
     }
 
     res.json(user);

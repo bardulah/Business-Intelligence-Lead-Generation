@@ -1,4 +1,4 @@
-import analysisQueue, { AnalysisJobData, AnalysisJobProgress } from '../config/queue';
+import analysisQueue, { AnalysisJobData } from '../config/queue';
 import githubScanner from '../services/githubScanner';
 import leadScoring from '../services/leadScoring';
 import prisma from '../config/database';
@@ -12,7 +12,8 @@ const companyResearch = require('./companyResearch');
 
 // Process lead analysis jobs
 analysisQueue.process(async (job) => {
-  const { userId, github, website } = job.data as AnalysisJobData;
+  const { userId, github } = job.data as AnalysisJobData;
+  let { website } = job.data as AnalysisJobData;
 
   logger.info(`Processing lead analysis job ${job.id}`, { userId, github, website });
 
@@ -119,6 +120,11 @@ analysisQueue.process(async (job) => {
     await updateJobProgress(job.id as string, 95, 'Calculating lead score');
 
     leadData.scoring = leadScoring.calculateLeadScore(leadData);
+    leadData.metadata = leadData.metadata || {
+      analyzedAt: new Date().toISOString(),
+      source: github ? 'github' : 'website',
+      url: website,
+    };
 
     // Save to database
     logger.info('Saving lead to database');
@@ -169,7 +175,7 @@ analysisQueue.process(async (job) => {
   }
 });
 
-async function updateJobProgress(jobId: string, progress: number, message: string) {
+async function updateJobProgress(jobId: string, progress: number, _message: string) {
   try {
     await prisma.analysisJob.upsert({
       where: { jobId },

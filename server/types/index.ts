@@ -120,6 +120,10 @@ export interface CompanyProfile {
   location: string | null;
   foundedYear: number | null;
   size: string | null;
+  email?: string | null;
+  createdAt?: string;
+  publicRepos?: number;
+  followers?: number;
   website: {
     title: string;
     description: string;

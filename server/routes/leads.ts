@@ -55,7 +55,8 @@ router.get('/job/:jobId', async (req: AuthRequest, res, next) => {
     const job = await analysisQueue.getJob(jobId);
 
     if (!job) {
-      return res.status(404).json({ error: 'Job not found' });
+      res.status(404).json({ error: 'Job not found' });
+      return;
     }
 
     const state = await job.getState();
@@ -139,7 +140,8 @@ router.get('/:id', async (req: AuthRequest, res, next) => {
     });
 
     if (!lead) {
-      return res.status(404).json({ error: 'Lead not found' });
+      res.status(404).json({ error: 'Lead not found' });
+      return;
     }
 
     res.json(lead);
@@ -160,7 +162,8 @@ router.patch('/:id', async (req: AuthRequest, res, next) => {
     });
 
     if (!lead) {
-      return res.status(404).json({ error: 'Lead not found' });
+      res.status(404).json({ error: 'Lead not found' });
+      return;
     }
 
     const updated = await prisma.lead.update({
@@ -201,7 +204,8 @@ router.delete('/:id', async (req: AuthRequest, res, next) => {
     });
 
     if (!lead) {
-      return res.status(404).json({ error: 'Lead not found' });
+      res.status(404).json({ error: 'Lead not found' });
+      return;
     }
 
     await prisma.lead.delete({
