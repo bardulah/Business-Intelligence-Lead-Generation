@@ -1,6 +1,5 @@
 import Queue from 'bull';
 import logger from '../utils/logger';
-import redis from './redis';
 
 export const analysisQueue = new Queue('lead-analysis', {
   redis: {

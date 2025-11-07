@@ -9,7 +9,7 @@ export interface AuthRequest extends Request {
 
 export function authenticate(
   req: AuthRequest,
-  res: Response,
+  _res: Response,
   next: NextFunction
 ): void {
   try {
@@ -42,7 +42,7 @@ export function authenticate(
 }
 
 export function authorize(...roles: string[]) {
-  return (req: AuthRequest, res: Response, next: NextFunction): void => {
+  return (req: AuthRequest, _res: Response, next: NextFunction): void => {
     if (!req.user) {
       return next(new AuthenticationError('Not authenticated'));
     }
@@ -57,11 +57,12 @@ export function authorize(...roles: string[]) {
 
 export function generateToken(payload: AuthTokenPayload): string {
   const secret = process.env.JWT_SECRET;
-  const expiresIn = process.env.JWT_EXPIRES_IN || '7d';
 
   if (!secret) {
     throw new Error('JWT_SECRET not configured');
   }
 
-  return jwt.sign(payload, secret, { expiresIn });
+  return jwt.sign(payload, secret, {
+    expiresIn: (process.env.JWT_EXPIRES_IN || '7d') as any,
+  });
 }
