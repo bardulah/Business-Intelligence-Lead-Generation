@@ -25,7 +25,7 @@ This is a full-stack web application designed to help users find and qualify bus
 ### Key Files
 *   `INSTRUCTIONS.md`: User-facing guide on how to use the application.
 *   `AGENTS.md`: This file.
-*   `.env`: **Contains production API keys and credentials.**
+*   `.env`: **Contains production API keys and credentials. This file is gitignored.**
 *   `ecosystem.config.js`: (Located in `/opt/deployment/`) PM2 configuration file.
 
 ---
@@ -46,13 +46,13 @@ This section outlines potential future enhancements for the project.
 
 ### How to Work on This Project
 
-*   **Running Locally**: The recommended way to work on this project is to use the `docker-compose.yml` file for a consistent development environment. Run `docker-compose up -d` in the project root. **Note:** The `.env` file is now configured with production values; you may need to switch it to a local database/redis for local development.
+*   **Running Locally**: The recommended way to work on this project is to use the `docker-compose.yml` file for a consistent development environment. Run `docker-compose up -d` in the project root.
 *   **Deployment**: The application is deployed using **PM2**. To restart the live service after making changes, you would typically run `pm2 restart lead-gen`.
 *   **Database**: The production database is a cloud-hosted Neon PostgreSQL instance. The connection string is in the `.env` file.
 *   **Updating Documentation**: If you make any user-facing changes, update the `INSTRUCTIONS.md` file. If you make architectural or deployment changes, update this `AGENTS.md` file.
 
 ### What to Watch Out For
 
-*   **Environment Variables**: This project relies heavily on API keys and database credentials stored in the `.env` file. This file is now populated with the correct production values.
+*   **Environment Variables**: This project relies heavily on API keys and database credentials stored in a `.env` file. This file is gitignored and must be created manually from `.env.example` for local development. The production server has the correct variables configured for the PM2 process.
 *   **Background Jobs**: The application uses Redis and Bull for background job processing. If leads are not being processed, check the status of the Redis service and the Bull queue.
 *   **Deployment Mismatch**: Be aware that the live deployment method (PM2) is different from the local development setup (Docker).
