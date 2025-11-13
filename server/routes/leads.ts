@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { AuthRequest, authenticate } from '../middleware/auth';
-import { analysisLimiter } from '../middleware/rateLimiter';
+// import { analysisLimiter } from '../middleware/rateLimiter'; // temporarily disabled
 import { validateSchema, AnalysisRequestSchema } from '../utils/validation';
 import analysisQueue from '../config/queue';
 import prisma from '../config/database';
@@ -12,7 +12,7 @@ const router = Router();
 router.use(authenticate);
 
 // Analyze a lead (async with job queue)
-router.post('/analyze', analysisLimiter, async (req: AuthRequest, res, next) => {
+router.post('/analyze', /* analysisLimiter, */ async (req: AuthRequest, res, next) => {
   try {
     const data = validateSchema(AnalysisRequestSchema, req.body);
     const userId = req.user!.userId;

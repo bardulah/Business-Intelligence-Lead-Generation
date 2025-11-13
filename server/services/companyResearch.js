@@ -1,5 +1,6 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
+const apolloEnrichment = require('./apolloEnrichment');
 
 class CompanyResearch {
   constructor() {
@@ -8,6 +9,24 @@ class CompanyResearch {
 
   async researchCompany(domain, additionalData = {}) {
     try {
+      // First try Apollo.io enrichment
+      const fallbackData = {
+        name: additionalData.name,
+        location: additionalData.location,
+        publicRepos: additionalData.publicRepos,
+        contributors: additionalData.contributors,
+      };
+
+      const apolloData = await apolloEnrichment.enrichCompany(domain, fallbackData);
+      
+      // If Apollo returned enriched data, use it
+      if (apolloData.metadata && apolloData.metadata.dataSource === 'apollo.io') {
+        console.log(`✅ Apollo.io enrichment successful for ${domain}`);
+        return apolloData;
+      }
+
+      // Fallback to web scraping if Apollo fails
+      console.log(`🔄 Apollo.io failed, falling back to web scraping for ${domain}`);
       const [websiteData, whoisData] = await Promise.all([
         this.analyzeWebsite(domain),
         this.getWhoisData(domain).catch(() => null)

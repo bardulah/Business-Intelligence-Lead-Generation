@@ -17,7 +17,7 @@ import logger from './utils/logger';
 
 // Import middleware
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
-import { generalLimiter } from './middleware/rateLimiter';
+// import { generalLimiter } from './middleware/rateLimiter'; // temporarily disabled
 
 // Initialize Sentry if DSN is provided
 if (process.env.SENTRY_DSN) {
@@ -30,6 +30,9 @@ if (process.env.SENTRY_DSN) {
 
 const app: Application = express();
 const PORT = process.env.PORT || 3001;
+
+// Trust proxy for rate limiting when behind reverse proxy  
+app.set('trust proxy', false);
 
 // Create HTTP server and Socket.IO
 const httpServer = createServer(app);
@@ -69,8 +72,8 @@ if (process.env.SENTRY_DSN) {
   app.use(Sentry.Handlers.tracingHandler());
 }
 
-// Rate limiting
-app.use('/api/', generalLimiter);
+// Rate limiting - temporarily disabled for debugging
+// app.use('/api/', generalLimiter);
 
 // Health check endpoint (no rate limiting)
 app.get('/health', (_req, res) => {

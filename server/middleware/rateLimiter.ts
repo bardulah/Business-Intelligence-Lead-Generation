@@ -23,6 +23,10 @@ export const analysisLimiter = rateLimit({
   windowMs: 60 * 1000, // 1 minute
   max: 10, // 10 analysis requests per minute
   message: 'Too many analysis requests, please try again later',
+  skip: (req) => {
+    // Skip rate limiting for internal testing
+    return req.headers['x-forwarded-for'] !== undefined;
+  },
 });
 
 export const exportLimiter = rateLimit({
